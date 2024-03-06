@@ -13,12 +13,11 @@ const metadata = {
 
 <Layout metadata={metadata}>
 
-  <script is:inline src='https://api.mapbox.com/mapbox.js/v3.3.1/mapbox.js'></script>
-  <link href='https://api.mapbox.com/mapbox.js/v3.3.1/mapbox.css' rel='stylesheet' />
- 
+
+
 <div id="map" class="border p-5 min-h-screen w-full bg-gray-300"></div>
 <script is:inline type="text/javascript">
-	const accessToken = 'pk.eyJ1IjoiYnJhZG1pbGxzMjQiLCJhIjoiY2xxb2FranR6Mm1iNzJpbzBuend0NG5jaiJ9.vji3bQ-4cBRDgDokwmM3kg';
+	mapboxgl.accessToken = 'pk.eyJ1IjoiYnJhZG1pbGxzMjQiLCJhIjoiY2xxb2FranR6Mm1iNzJpbzBuend0NG5jaiJ9.vji3bQ-4cBRDgDokwmM3kg';
 
   const features = [
     {
@@ -123,37 +122,63 @@ const metadata = {
     }
 ];
 
-L.mapbox.accessToken = accessToken;
-  var map = L.mapbox.map('map')
-    .setView([40, -74.5], 9)
-    .addLayer(L.mapbox.styleLayer('mapbox://styles/mapbox/streets-v11'));
+    const map = new mapboxgl.Map({
+        container: 'map',
+        // Choose from Mapbox's core styles, or make your own style with Mapbox Studio
+        style: 'mapbox://styles/mapbox/streets-v12',
+        center: features[0].geometry?.coordinates,
+        zoom: 9
+    });
+    
+let bounds1 = [];
+features.forEach((p) => {
+  bounds1.push(p?.geometry?.coordinates)
+});
 
-  // Array of points with latitudes, longitudes, and radius in meters
-  var points = [
-    { coordinates: [40.7, -74.5], radius: 1000 }, // Example point with a radius of 1000 meters
-    { coordinates: [40.8, -74.6], radius: 1500 }, // Example point with a radius of 1500 meters
-    // Add more points as needed
-  ];
+let bounds = bounds1.reduce(function(bounds, coord) {
+  return bounds.extend(coord);
+}, new mapboxgl.LngLatBounds(bounds1[0], bounds1[0]));
 
-  // Add points and circles to the map
-  points.forEach(function(point) {
-    var circle = L.circle(point.coordinates, {
-      color: 'red',
-      fillColor: '#f03',
-      fillOpacity: 0.5,
-      radius: point.radius // Radius is specified in meters
-    }).addTo(map);
+console.log({bounds})
+    map.on('load', () => {
+        // Add an image to use as a custom marker
+        map.loadImage(
+            'https://docs.mapbox.com/mapbox-gl-js/assets/custom_marker.png',
+            (error, image) => {
+                if (error) throw error;
+                map.addImage('custom-marker', image);
+                // Add a GeoJSON source with 2 points
+                map.addSource('points', {
+                    'type': 'geojson',
+                    'data': {
+                        'type': 'FeatureCollection',
+                        features
+                    }
+                });
 
-    // Add marker at the center of the circle
-    L.marker(point.coordinates).addTo(map);
-  });
+                
+                // Add a symbol layer
+                map.addLayer({
+                    'id': 'points',
+                    'type': 'symbol',
+                    'source': 'points',
+                    'layout': {
+                        'icon-image': 'custom-marker',
+                        // get the title name from the source's "title" property
+                        'text-field': ['get', 'title'],
+                        'text-font': [
+                            'Open Sans Semibold',
+                            'Arial Unicode MS Bold'
+                        ],
+                        'text-offset': [0, 1.25],
+                        'text-anchor': 'top'
+                    }
+                });
 
-  var bounds = points.map(function(point) {
-    return L.latLng(point.coordinates);
-  });
-
-  // Fit the map to the bounding box
-  map.fitBounds(bounds);
+                setTimeout(() => map.fitBounds(bounds, {padding: 30}), 1000)
+            }
+        );
+    });
 </script>
 
 </Layout>
