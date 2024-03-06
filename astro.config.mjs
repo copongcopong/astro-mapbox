@@ -1,6 +1,6 @@
 import path from 'path';
 import { fileURLToPath } from 'url';
-
+import node from '@astrojs/node';
 import { defineConfig, squooshImageService } from 'astro/config';
 
 import sitemap from '@astrojs/sitemap';
@@ -29,8 +29,11 @@ export default defineConfig({
   base: SITE.base,
   trailingSlash: SITE.trailingSlash ? 'always' : 'never',
 
-  output: 'static',
-
+  //output: 'static',
+  output: 'server',
+  adapter: node({
+    mode: 'standalone',
+  }),
   integrations: [
     tailwind({
       applyBaseStyles: false,
