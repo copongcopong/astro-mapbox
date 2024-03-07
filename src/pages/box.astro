@@ -1,0 +1,90 @@
+---
+import Features2 from '~/components/widgets/Features2.astro';
+import Features3 from '~/components/widgets/Features3.astro';
+import Hero from '~/components/widgets/Hero.astro';
+import Stats from '~/components/widgets/Stats.astro';
+import Steps2 from '~/components/widgets/Steps2.astro';
+import Layout from '~/layouts/PageLayout.astro';
+
+const metadata = {
+  title: 'About us',
+};
+---
+
+<Layout metadata={metadata}>
+
+
+
+<div id="map" class="border p-5 min-h-screen w-full bg-gray-300"></div>
+<script is:inline type="text/javascript">
+	mapboxgl.accessToken = 'pk.eyJ1IjoiYnJhZG1pbGxzMjQiLCJhIjoiY2xxb2FranR6Mm1iNzJpbzBuend0NG5jaiJ9.vji3bQ-4cBRDgDokwmM3kg';
+
+  // Define coordinates for the rectangle polygon
+  var coordinates = [
+  [-122.05574912712179, 37.34492098169676],
+  [-122.02316729832913, 37.34456392893961],
+  [-122.05440175826199, 37.33076740884272],
+  [-122.02431052039205, 37.33028042654004]
+  ];
+
+  var map = new mapboxgl.Map({
+    container: 'map',
+    style: 'mapbox://styles/mapbox/streets-v11',
+    center: coordinates[0], // starting position [lng, lat]
+    zoom: 9 // starting zoom
+  });
+
+  const bounds = coordinates.reduce(function(bounds, coord) {
+  return bounds.extend(coord);
+}, new mapboxgl.LngLatBounds(coordinates[0], coordinates[0]));
+
+
+var coordinates = [
+    [-122.05574912712179, 37.34492098169676],
+    [-122.02316729832913, 37.34492098169676],
+    [-122.02316729832913, 37.33028042654004],
+    [-122.05574912712179, 37.33028042654004],
+    [-122.05574912712179, 37.34492098169676]
+  ];
+
+  // Add a rectangle polygon to the map
+  map.on('load', function () {
+    map.addLayer({
+      'id': 'rectangle',
+      'type': 'fill',
+      'source': {
+        'type': 'geojson',
+        'data': {
+          'type': 'Feature',
+          'geometry': {
+            'type': 'Polygon',
+            'coordinates': [coordinates]
+          }
+        }
+      },
+      'layout': {},
+      'paint': {
+        'fill-color': '#088',
+        'fill-opacity': 0.5
+      }
+    });
+
+    var center = bounds.getCenter();
+    new mapboxgl.Marker()
+      .setLngLat(center)
+      .addTo(map);
+    // Add click event listener to the map
+    map.on('click', function(e) {
+      // Get the clicked coordinates
+      var lngLat = e.lngLat;
+      // Log the coordinates to console
+      console.log('Clicked coordinates:', lngLat);
+      // You can use the coordinates here as needed
+    });
+
+    setTimeout(() => map.fitBounds(bounds, {padding: 30}), 1000)
+  });
+
+</script>
+
+</Layout>
