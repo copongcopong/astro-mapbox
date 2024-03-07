@@ -20,14 +20,15 @@ const metadata = {
 	mapboxgl.accessToken = 'pk.eyJ1IjoiYnJhZG1pbGxzMjQiLCJhIjoiY2xxb2FranR6Mm1iNzJpbzBuend0NG5jaiJ9.vji3bQ-4cBRDgDokwmM3kg';
 
   // Define coordinates for the rectangle polygon
-  var coordinates = [
-  [-122.05574912712179, 37.34492098169676],
-  [-122.02316729832913, 37.34456392893961],
-  [-122.05440175826199, 37.33076740884272],
-  [-122.02431052039205, 37.33028042654004]
+  const coordinates = [
+    [-122.05574912712179, 37.34492098169676],
+    [-122.02316729832913, 37.34492098169676],
+    [-122.02316729832913, 37.33028042654004],
+    [-122.05574912712179, 37.33028042654004],
+   // [-122.05574912712179, 37.34492098169676]
   ];
 
-  var map = new mapboxgl.Map({
+  const map = new mapboxgl.Map({
     container: 'map',
     style: 'mapbox://styles/mapbox/streets-v11',
     center: coordinates[0], // starting position [lng, lat]
@@ -39,13 +40,6 @@ const metadata = {
 }, new mapboxgl.LngLatBounds(coordinates[0], coordinates[0]));
 
 
-var coordinates = [
-    [-122.05574912712179, 37.34492098169676],
-    [-122.02316729832913, 37.34492098169676],
-    [-122.02316729832913, 37.33028042654004],
-    [-122.05574912712179, 37.33028042654004],
-    [-122.05574912712179, 37.34492098169676]
-  ];
 
   // Add a rectangle polygon to the map
   map.on('load', function () {
@@ -69,14 +63,14 @@ var coordinates = [
       }
     });
 
-    var center = bounds.getCenter();
+    const center = bounds.getCenter();
     new mapboxgl.Marker()
       .setLngLat(center)
       .addTo(map);
     // Add click event listener to the map
     map.on('click', function(e) {
       // Get the clicked coordinates
-      var lngLat = e.lngLat;
+      const lngLat = e.lngLat;
       // Log the coordinates to console
       console.log('Clicked coordinates:', lngLat);
       // You can use the coordinates here as needed
